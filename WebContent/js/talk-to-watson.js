@@ -331,7 +331,7 @@ var conversation_result, is_wating = false, methods = {
 				}).always(function always() {
 					$loading.hide();
 					scrollChatToBottom();
-					$chatInput.focus();
+//					$chatInput.focus();
 				});
 			};
 		};
