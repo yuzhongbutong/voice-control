@@ -434,16 +434,36 @@ var conversation_result, is_wating = false, methods = {
 			}
 			return direction;
 		};
+		
+		var isMobile = function() {
+			var userAgentInfo = navigator.userAgent;  
+			var agents = new Array("Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod");  
+			var flag = false;  
+			for (var i = 0; i < agents.length; i++) {  
+				if (userAgentInfo.indexOf(agents[i]) != -1) {
+					flag = true;
+					break;
+				}  
+			}  
+			return flag; 
+		};
+
+		var event_down = 'mousedown';
+		var event_up = 'mouseup';
+		if (isMobile()) {
+			event_down = 'touchstart';
+			event_up = 'touchend';
+		}
 
 		var keys = $('.car-controller a');
-		keys.on('mousedown', function(evt){
+		keys.on(event_down, function(evt){
 			var command = $(this).attr('ref');
 			// call Socket-IO
 //			onSendingCommand(command);
 //			keysToCommand(command);
 			sendCommand(command, command);
 		});
-		keys.on('mouseup', function(evt){
+		keys.on(event_up, function(evt){
 //			var command = $(this).attr('ref');
 			// call Socket-IO
 //			onSendingCommand(command);
