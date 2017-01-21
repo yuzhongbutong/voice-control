@@ -45,23 +45,15 @@ public class HttpApplicationDeviceEventPublish {
 		try {
 			// Instantiate the class by passing the properties file
 			myClient = new ApplicationClient(PROPERTIES_ENTRY);
-			myClient.connect();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+			myClient.connect(5);
 
-		/**
-		 * Publishes this process load event for every 5 second
-		 */
-
-		// publish the event on behalf of device
-		try {
 			boolean code = myClient.publishEvent(deviceType, deviceId, "data_car", data, "json", 1);
 			if (code == true) {
 				System.out.println("Published the event successfully !");
 			} else {
 				System.out.println("Failed to publish the event......");
 			}
+			myClient.disconnect();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

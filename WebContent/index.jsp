@@ -87,16 +87,17 @@
 						<div id="control-panel" class="tab-panels--tab-pane active" role="tab-panel">
 							<div class="car-controller">
 								<div class="row">
-									<a class="item item-up" ref="w"><i class="ion-arrow-up-b"></i></a>
+									<a class="item item-up" ref="F"><i class="ion-arrow-up-b"></i></a>
 								</div>
 								<div class="row">
-									<a class="item item-left" ref="a"><i class="ion-arrow-left-b"></i></a>
-									<a class="item item-right" ref="d"><i class="ion-arrow-right-b"></i></a>
+									<a class="item item-left" ref="L"><i class="ion-arrow-left-b"></i></a>
+									<a class="item item-right" ref="R"><i class="ion-arrow-right-b"></i></a>
 								</div>
 								<div class="row">
-									<a class="item item-down" ref="s"><i class="ion-arrow-down-b"></i></a>
+									<a class="item item-down" ref="B"><i class="ion-arrow-down-b"></i></a>
 								</div>
 							</div>
+							<input type="text" id="keyResult">
 						</div>
 					</div>
 				</div>

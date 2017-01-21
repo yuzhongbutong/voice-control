@@ -27,8 +27,20 @@ var conversation_result, is_wating = false, methods = {
 		$chatInput.keyup(function(event){
 			if(event.keyCode === 13) {
 				var inputText = $(this).val();
+				if (inputText != '') {
+					// converse(inputText);
+					textToCommand(inputText);
+					$(this).val('');
+				}
+			}
+		});
+
+		$chatInput.blur(function(event){
+			var inputText = $(this).val();
+			if (inputText != '') {
 				// converse(inputText);
-				// talk('YOU', inputText);
+				textToCommand(inputText);
+				$(this).val('');
 			}
 		});
 
@@ -245,9 +257,12 @@ var conversation_result, is_wating = false, methods = {
 				}
 			});
 		};
-		
 
-		var voiceControl = function(words) {
+		var textToCommand = function(words) {
+			if (words == '') {
+				return;
+			}
+			talk('YOU', words);
 			var cmd;
 			var message;
 			var lowerWords = words.toLowerCase();
@@ -263,11 +278,45 @@ var conversation_result, is_wating = false, methods = {
 			} else if (lowerWords.indexOf('right') != -1) {
 				message = 'right';
 				cmd = 'R';
+			} else if (lowerWords.indexOf('stop') != -1) {
+				message = 'stop';
+				cmd = 'S';
 			} else {
 				talk('WATSON', 'Cannot found the command!');
 			}
 
-			if (cmd != null && cmd != '' && typeof (cmd) != 'undefined') {
+			sendCommand(cmd, message);
+		};
+
+		/**var keysToCommand = function(key) {
+			$('#keyResult').val(key);
+			var cmd;
+			switch (key) {
+			case 'w':
+				cmd = 'F';
+				break;
+			case 's':
+				cmd = 'B';
+				break;
+			case 'a':
+				cmd = 'L';
+				break;
+			case 'd':
+				cmd = 'R';
+				break;
+			case 'stop':
+				cmd = 'S';
+				break;
+			default:
+				return;
+			}
+
+			sendCommand(cmd);
+		};*/
+		
+		var sendCommand = function(cmd, message) {
+			$('#keyResult').val(cmd);
+			if (cmd != null && cmd != '' && typeof (cmd) != 'undefined' && 'FBLRS'.indexOf(cmd) != -1) {
 				$.ajax({
 					url : 'Car',
 					method : 'POST',
@@ -285,7 +334,7 @@ var conversation_result, is_wating = false, methods = {
 					$chatInput.focus();
 				});
 			};
-		}
+		};
 
 		var isSpeaking = false, stream = null, ttsToken = '', sttToken = '';
 
@@ -309,14 +358,13 @@ var conversation_result, is_wating = false, methods = {
 					console.log(data);
 					var transcript = data.alternatives[0].transcript;
 					$('.ui-transcription').html('<div class="text">'+transcript+'</div>');
-					voiceControl(transcript);
+					textToCommand(transcript);
 	
 					if(data.hasOwnProperty('final') && data['final']){
 						isSpeaking = false;
 						changeUIState(isSpeaking);
 						stream.stop();
 						// converse(transcript);
-						talk('YOU', transcript);
 						$('.ui-transcription').text('');
 					}
 				});
@@ -341,6 +389,7 @@ var conversation_result, is_wating = false, methods = {
 		initToken('stt').then(function(t) {
 			sttToken = t;
 			// converse('Hi Watson');
+			talk('WATSON', 'Please enter a command:');
 			$loading.hide();
 			var userAgent = window.navigator.userAgent.toLowerCase();
 			if(userAgent.indexOf('chrome') != -1 || userAgent.indexOf('firefox') != -1){
@@ -350,7 +399,7 @@ var conversation_result, is_wating = false, methods = {
 		scrollToInput();
 
 		// car control
-		var socket = io.connect(carServiceHost);
+		/**var socket = io.connect(carServiceHost);
 
 		socket.on("message", function (data) {
 			console.log("socket data: " + data);
@@ -362,49 +411,69 @@ var conversation_result, is_wating = false, methods = {
 			}
 			console.log(command);
 			socket.emit("String", command);
-		};
+		};*/
 		var keyToCommand = function(key){
 			var direction = '';
 			switch(key){
 
 			case 'ArrowUp':
-				direction = 'w';
+				direction = 'F';
 				break;
 
 			case 'ArrowLeft':
-				direction = 'a';
+				direction = 'L';
 				break;
 
 			case 'ArrowDown':
-				direction = 's';
+				direction = 'B';
 				break;
 
 			case 'ArrowRight':
-				direction = 'd';
+				direction = 'R';
 				break;
 			}
 			return direction;
 		};
 
 		var keys = $('.car-controller a');
-		keys.on('click', function(evt){
+		keys.on('mousedown', function(evt){
 			var command = $(this).attr('ref');
 			// call Socket-IO
-			onSendingCommand(command);
+//			onSendingCommand(command);
+//			keysToCommand(command);
+			sendCommand(command, command);
 		});
+		keys.on('mouseup', function(evt){
+//			var command = $(this).attr('ref');
+			// call Socket-IO
+//			onSendingCommand(command);
+//			keysToCommand('stop');
+			sendCommand('S', 'S');
+		});
+//		keys.on('mouseout', function(evt){
+//			var command = $(this).attr('ref');
+//			// call Socket-IO
+////			onSendingCommand(command);
+////			keysToCommand('stop');
+//			sendCommand('S', 'S');
+//		});
 
-		$(document).on('keyup', function(evt){
-			var command = keyToCommand(evt.key);
-			onSendingCommand(command);
-			keys.removeClass('active');
-		});
-		$(document).on('keydown', function(evt){
-			var command = keyToCommand(evt.key);
-			if(command === ''){
-				return;
-			}
-			keys.parent().find('[ref='+command+']').addClass('active');
-		});
+//		$(document).on('keyup', function(evt){
+//			var command = keyToCommand(evt.key);
+////			onSendingCommand(command);
+////			keysToCommand('stop');
+//			keys.removeClass('active');
+//			sendCommand('S', 'S');
+//		});
+//		$(document).on('keydown', function(evt){
+//			var command = keyToCommand(evt.key);
+////			if(command === ''){
+////				return;
+////			}
+////			keysToCommand(command);
+//			keys.parent().find('[ref='+command+']').addClass('active');
+//			sendCommand(command, command);
+//		});
 	}
 };
 
